@@ -36,16 +36,17 @@ class CarViewSet(ModelViewSet):
             return Car.objects.all()
         if self.request.query_params.get("ordering") == "popular":
             return Car.objects.popular()
-        return Car.objects.annotate(avg_rating=Avg("ratings"))
+        return Car.objects.annotate(avg_rating=Avg("ratings__rating"))
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         model = serializer.validated_data["model"]
         make = serializer.validated_data["make"]
-        _, created = Car.objects.get_or_create(
+        obj, created = Car.objects.get_or_create(
             model=model, make=make, user=request.user
         )
+        serializer = self.get_serializer(obj)
         if created:
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.data)
