@@ -16,4 +16,6 @@ RUN pip install -r requirements.txt
 
 COPY . $APP_HOME
 
+RUN python manage.py test
+
 ENTRYPOINT ["/home/app/entrypoint.sh"]
